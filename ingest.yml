@@ -1,0 +1,48 @@
+# .github/workflows/ingest.yml
+# Runs the full ingestion pipeline every 15 minutes — completely free on GitHub Actions.
+# Add your secrets in: GitHub repo → Settings → Secrets and variables → Actions
+
+name: Threat Data Ingestion
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'    # every 15 minutes, 24/7
+  workflow_dispatch:            # allows manual trigger from GitHub UI
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10         # kill if stuck (protects free tier minutes)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install pymongo pydantic python-dotenv requests
+          pip install -r requirements.txt --quiet
+
+      - name: Run ingestion (NVD + OTX + AbuseIPDB + Simulation)
+        run: python ingestion/fetch_all.py --sources nvd otx abuseipdb sim --sim-count 50
+        env:
+          MONGO_URI:            ${{ secrets.MONGO_URI }}
+          OTX_API_KEY:          ${{ secrets.OTX_API_KEY }}
+          ABUSEIPDB_KEY:        ${{ secrets.ABUSEIPDB_KEY }}
+          MONGO_DB_NAME:        cyber_threats
+          TELEGRAM_BOT_TOKEN:   ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:     ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ingestion-logs
+          path: "*.log"
+          retention-days: 3
