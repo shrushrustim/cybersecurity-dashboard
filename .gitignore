@@ -1,0 +1,45 @@
+# ── Secrets — NEVER commit these ──────────────────────────────────────────────
+.env
+*.env
+.env.*
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── ML models (large binary files — retrain on server) ────────────────────────
+ml_service/models/*.pkl
+
+# ── Logs & temp files ─────────────────────────────────────────────────────────
+*.log
+nohup.out
+/tmp/
+*.tmp
+threat_report_*.pdf
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Claude Code ───────────────────────────────────────────────────────────────
+.claude/
+
+# ── Jupyter ───────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/

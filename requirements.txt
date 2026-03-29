@@ -1,0 +1,41 @@
+# ── requirements.txt (shared base — works for ingestion + dashboard) ──────────
+# Install with: pip install -r requirements.txt
+
+# Core
+pydantic==2.5.3
+python-dotenv==1.0.0
+requests==2.31.0
+httpx==0.26.0
+
+# MongoDB
+pymongo==4.6.1
+motor==3.3.2        # async driver for FastAPI backend
+certifi==2024.2.2   # TLS cert bundle for MongoDB Atlas
+
+# Data
+pandas==2.1.4
+numpy==1.26.3
+
+# Visualization (Module 2 + 3)
+plotly==5.18.0
+dash==2.14.2
+dash-bootstrap-components==1.5.0
+
+# ML (Module 3 anomaly detection)
+scikit-learn==1.4.0
+joblib==1.3.2
+
+# Backend API
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+gunicorn==21.2.0
+
+# Scheduling (local dev)
+apscheduler==3.10.4
+
+# Redis cache
+redis==5.0.1
+
+# Report generation
+reportlab==4.1.0   # pure-Python PDF generation — safe on Render free tier
+# kaleido==0.2.1   ← kept removed: downloads Chromium binary, breaks Render free tier build

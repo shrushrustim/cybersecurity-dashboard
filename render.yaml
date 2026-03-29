@@ -1,0 +1,55 @@
+# render.yaml — Render Blueprint File
+# This single file defines ALL three services on Render.
+# Push to GitHub, connect repo on render.com, and all 3 deploy automatically.
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+
+  # ── Service 1: Plotly/Dash Dashboard (Module 4) ──────────────────────────────
+  - type: web
+    name: cyber-threat-dashboard-v2
+    runtime: python
+    rootDir: .
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn dashboard.app:server --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    plan: free
+    envVars:
+      - key: MONGO_URI
+        sync: false          # set manually in Render dashboard (never commit secrets)
+      - key: REDIS_URL
+        sync: false
+      - key: ML_SERVICE_URL
+        sync: false          # fill in after ML service is deployed
+      - key: BACKEND_URL
+        sync: false
+      - key: DASH_DEBUG
+        value: "false"
+      - key: REFRESH_INTERVAL_MS
+        value: "30000"
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+
+  # ── Service 2: FastAPI ML Microservice ───────────────────────────────────────
+  - type: web
+    name: cyber-threat-ml-api-v2
+    runtime: python
+    rootDir: .
+    buildCommand: pip install fastapi uvicorn scikit-learn joblib pandas numpy pydantic python-dotenv
+    startCommand: uvicorn ml_service.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+
+  # ── Service 3: Background Ingestion Worker ────────────────────────────────────
+  # NOTE: Render free tier background workers sleep — use GitHub Actions cron instead.
+  # This is kept here as an alternative if you upgrade to paid tier.
+  # - type: worker
+  #   name: cyber-threat-ingestion-worker
+  #   runtime: python
+  #   rootDir: .
+  #   buildCommand: pip install -r requirements.txt
+  #   startCommand: python ingestion/run_scheduler.py
+  #   plan: free
